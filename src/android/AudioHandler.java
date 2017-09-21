@@ -121,7 +121,8 @@ public class AudioHandler extends CordovaPlugin {
             } catch (IllegalArgumentException e) {
                 fileUriStr = target;
             }
-            promptForRecord();
+            this.useOptions = false;
+            promptForRecord(this.useCompression);
         }
         else if(action.equals("startRecordingAudioWithOptions")) {
           recordId = args.getString(0);
@@ -136,7 +137,7 @@ public class AudioHandler extends CordovaPlugin {
 
             JSONObject options = args.getJSONObject(2);
 
-            Log.d(LOG_TAG, "Recording with options" + options);
+            Log.e(TAG, "Recording with options" + options);
 
             //console.log('Json Object option: ' + JSON.stringify(options));
 
