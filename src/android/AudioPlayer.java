@@ -18,6 +18,7 @@
 */
 package org.apache.cordova.media;
 
+import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -86,7 +87,7 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
     private float duration = -1;            // Duration of audio
 
     private MediaRecorder recorder = null;  // Audio recording object
-    private AudioManager manager = new AudioManager(); // Audio manager object
+    //private AudioManager manager = new AudioManager(); // Audio manager object
     private LinkedList<String> tempFiles = null; // Temporary recording file name
     private String tempFile = null;
 
@@ -191,7 +192,8 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
         case NONE:
             this.audioFile = file;
             this.recorder = new MediaRecorder();
-            if(this.manager.getProperty("PROPERTY_SUPPORT_AUDIO_SOURCE_UNPROCESSED") != null){
+            AudioManager audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+            if(audioManager.getProperty(AudioManager.PROPERTY_SUPPORT_AUDIO_SOURCE_UNPROCESSED) !=null){
               this.recorder.setAudioSource(MediaRecorder.AudioSource.UNPROCESSED);
             } else {
               this.recorder.setAudioSource(MediaRecorder.AudioSource.VOICE_RECOGNITION);
