@@ -122,7 +122,7 @@ public class AudioHandler extends CordovaPlugin {
                 fileUriStr = target;
             }
             this.useOptions = false;
-            promptForRecord(this.useCompression);
+            promptForRecord(this.useOptions);
         }
         else if(action.equals("startRecordingAudioWithOptions")) {
           recordId = args.getString(0);
@@ -136,10 +136,7 @@ public class AudioHandler extends CordovaPlugin {
             }
 
             JSONObject options = args.getJSONObject(2);
-
-            Log.e(TAG, "Recording with options" + options);
-
-            //console.log('Json Object option: ' + JSON.stringify(options));
+            LOG.e(TAG, "Recording with options" + options);
 
             try {
                 this.audioChannels = options.getInt("NumberOfChannels");

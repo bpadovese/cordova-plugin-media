@@ -86,7 +86,7 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
     private float duration = -1;            // Duration of audio
 
     private MediaRecorder recorder = null;  // Audio recording object
-    private AudioManager manager = new MediaManager(); // Audio manager object
+    private AudioManager manager = new AudioManager(); // Audio manager object
     private LinkedList<String> tempFiles = null; // Temporary recording file name
     private String tempFile = null;
 
