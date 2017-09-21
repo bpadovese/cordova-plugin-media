@@ -18,7 +18,6 @@
 */
 package org.apache.cordova.media;
 
-import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -87,8 +86,7 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
     private float duration = -1;            // Duration of audio
 
     private MediaRecorder recorder = null;  // Audio recording object
-    private Context context;
-    //private AudioManager manager = new AudioManager(); // Audio manager object
+
     private LinkedList<String> tempFiles = null; // Temporary recording file name
     private String tempFile = null;
 
@@ -184,7 +182,7 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
      * @param channels          Audio channels, 1 or 2, optional, default value is 1
      * @param sampleRate        Sample rate in hz, 8000 to 48000, optional, default value is 44100
      */
-    public void startRecordingAudioWithOptions(String file, Integer channels, Integer sampleRate) {
+    public void startRecordingAudioWithOptions(String file, Integer channels, Integer sampleRate, boolean hasUnprocessed) {
         switch (this.mode) {
         case PLAY:
             LOG.d(LOG_TAG, "AudioPlayer Error: Can't record in play mode.");
@@ -193,8 +191,8 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
         case NONE:
             this.audioFile = file;
             this.recorder = new MediaRecorder();
-            AudioManager audioManager = (AudioManager) this.cordova.getActivity().getSystemService(Context.AUDIO_SERVICE);
-            if(audioManager.getProperty(AudioManager.PROPERTY_SUPPORT_AUDIO_SOURCE_UNPROCESSED) !=null){
+
+            if(hasUnprocessed){
               this.recorder.setAudioSource(MediaRecorder.AudioSource.UNPROCESSED);
             } else {
               this.recorder.setAudioSource(MediaRecorder.AudioSource.VOICE_RECOGNITION);

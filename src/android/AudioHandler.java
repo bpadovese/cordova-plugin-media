@@ -328,7 +328,13 @@ public class AudioHandler extends CordovaPlugin {
      */
     public void startRecordingAudioWithOptions(String id, String file, Integer channels, Integer sampleRate) {
         AudioPlayer audio = getOrCreatePlayer(id, file);
-        audio.startRecordingWithOptions(file, channels, sampleRate);
+        AudioManager audioManager = (AudioManager) this.cordova.getActivity().getSystemService(Context.AUDIO_SERVICE);
+        if(audioManager.getProperty(AudioManager.PROPERTY_SUPPORT_AUDIO_SOURCE_UNPROCESSED) !=null){
+          audio.startRecordingWithOptions(file, channels, sampleRate, true);
+        } else {
+          audio.startRecordingWithOptions(file, channels, sampleRate, false);
+        }
+
     }
 
     /**
