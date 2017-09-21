@@ -61,6 +61,9 @@ public class AudioHandler extends CordovaPlugin {
     ArrayList<AudioPlayer> pausedForFocus; // Audio players that were paused when focus was lost
     private int origVolumeStream = -1;
     private CallbackContext messageChannel;
+    private int audioChannels;
+    private int audioSampleRate;
+    private boolean useOptions;
 
 
     public static String [] permissions = { Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -79,6 +82,9 @@ public class AudioHandler extends CordovaPlugin {
         this.players = new HashMap<String, AudioPlayer>();
         this.pausedForPhone = new ArrayList<AudioPlayer>();
         this.pausedForFocus = new ArrayList<AudioPlayer>();
+        this.audioChannels = 1;
+        this.audioSampleRate = 44100;
+        this.useOptions = false;
     }
 
 
@@ -116,6 +122,30 @@ public class AudioHandler extends CordovaPlugin {
                 fileUriStr = target;
             }
             promptForRecord();
+        }
+        else if(action.equals("startRecordingAudioWithOptions")) {
+          recordId = args.getString(0);
+          String target = args.getString(1);
+
+          try {
+                Uri targetUri = resourceApi.remapUri(Uri.parse(target));
+                fileUriStr = targetUri.toString();
+            } catch (IllegalArgumentException e) {
+                fileUriStr = target;
+            }
+
+            JSONObject options = args.getJSONObject(2);
+            console.log('Json Object option: ' + JSON.stringify(options));
+            try {
+                this.audioChannels = options.getInt("NumberOfChannels");
+                this.audioSampleRate = options.getInt("SampleRate");
+            } catch (JSONException e) {
+                this.audioChannels = 1;
+                this.audioSampleRate = 44100;
+            }
+            this.useOptions = true;
+            promptForRecord(this.useOptions);
+
         }
         else if (action.equals("stopRecordingAudio")) {
             this.stopRecordingAudio(args.getString(0), true);
@@ -285,6 +315,18 @@ public class AudioHandler extends CordovaPlugin {
     public void startRecordingAudio(String id, String file) {
         AudioPlayer audio = getOrCreatePlayer(id, file);
         audio.startRecording(file);
+    }
+
+    /**
+     * Start recording and save the specified file with channels and sampleRate.
+     * @param id                The id of the audio player
+     * @param file              The name of the file
+     * @param channels          1 or 2, mono or stereo, default value is 1
+     * @param sampleRate        sample rate in hz, 8000 to 48000, optional, default value is 44100
+     */
+    public void startRecordingAudioWithOptions(String id, String file, Integer channels, Integer sampleRate) {
+        AudioPlayer audio = getOrCreatePlayer(id, file);
+        audio.startRecordingWithOptions(file, channels, sampleRate);
     }
 
     /**
@@ -528,7 +570,7 @@ public class AudioHandler extends CordovaPlugin {
                 return;
             }
         }
-        promptForRecord();
+        promptForRecord(this.useOptions);
     }
 
     /*
@@ -536,11 +578,15 @@ public class AudioHandler extends CordovaPlugin {
      *
      */
 
-    private void promptForRecord()
+    private void promptForRecord(boolean withOptions)
     {
         if(PermissionHelper.hasPermission(this, permissions[WRITE_EXTERNAL_STORAGE])  &&
                 PermissionHelper.hasPermission(this, permissions[RECORD_AUDIO])) {
-            this.startRecordingAudio(recordId, FileHelper.stripFileProtocol(fileUriStr));
+            if (withOptions){
+              this.startRecordingAudioWithOptions(recordId, FileHelper.stripFileProtocol(fileUriStr), this.audioChannels, this.audioSampleRate);
+            } else {
+              this.startRecordingAudio(recordId, FileHelper.stripFileProtocol(fileUriStr));
+            }
         }
         else if(PermissionHelper.hasPermission(this, permissions[RECORD_AUDIO]))
         {

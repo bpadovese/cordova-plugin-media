@@ -132,6 +132,15 @@ Media.prototype.startRecord = function() {
 };
 
 /**
+ * Start recording audio file, with options, android only.
+ */
+
+Media.prototype.startRecordWithOptions = function(options) {
+    exec(null, this.errorCallback, "Media", "startRecordingAudioWithOptions", [this.id, this.src, options]);
+};
+
+
+/**
  * Stop recording audio file.
  */
 Media.prototype.stopRecord = function() {

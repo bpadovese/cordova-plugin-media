@@ -175,6 +175,54 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
     }
 
     /**
+     * Start recording the specified file.
+     *
+     * @param file              The name of the file
+     * @param channels          Audio channels, 1 or 2, optional, default value is 1
+     * @param sampleRate        Sample rate in hz, 8000 to 48000, optional, default value is 44100
+     */
+    public void startRecording(String file, Integer channels, Integer sampleRate) {
+        switch (this.mode) {
+        case PLAY:
+            LOG.d(LOG_TAG, "AudioPlayer Error: Can't record in play mode.");
+            sendErrorStatus(MEDIA_ERR_ABORTED);
+            break;
+        case NONE:
+            this.audioFile = file;
+            this.recorder = new MediaRecorder();
+            if(AudioManager.getProperty("PROPERTY_SUPPORT_AUDIO_SOURCE_UNPROCESSED")){
+              this.recorder.setAudioSource(MediaRecorder.AudioSource.UNPROCESSED);
+            } else {
+              this.recorder.setAudioSource(MediaRecorder.AudioSource.VOICE_RECOGNITION);
+            }
+            this.recorder.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS); // RAW_AMR);
+            this.recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC); //AMR_NB);
+
+            this.recorder.setAudioChannels(channels);
+            this.recorder.setAudioSamplingRate(sampleRate);
+
+            this.tempFile = generateTempFile();
+            this.recorder.setOutputFile(this.tempFile);
+            try {
+                this.recorder.prepare();
+                this.recorder.start();
+                this.setState(STATE.MEDIA_RUNNING);
+                return;
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            sendErrorStatus(MEDIA_ERR_ABORTED);
+            break;
+        case RECORD:
+            LOG.d(LOG_TAG, "AudioPlayer Error: Already recording.");
+            sendErrorStatus(MEDIA_ERR_ABORTED);
+        }
+    }
+
+    /**
      * Save temporary recorded file to specified name
      *
      * @param file
