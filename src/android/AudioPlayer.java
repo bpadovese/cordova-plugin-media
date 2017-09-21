@@ -182,7 +182,7 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
      * @param channels          Audio channels, 1 or 2, optional, default value is 1
      * @param sampleRate        Sample rate in hz, 8000 to 48000, optional, default value is 44100
      */
-    public void startRecordingAudioWithOptions(String file, Integer channels, Integer sampleRate, boolean hasUnprocessed) {
+    public void startRecordingWithOptions(String file, Integer channels, Integer sampleRate, boolean hasUnprocessed) {
         switch (this.mode) {
         case PLAY:
             LOG.d(LOG_TAG, "AudioPlayer Error: Can't record in play mode.");
