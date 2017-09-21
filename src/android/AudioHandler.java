@@ -135,7 +135,11 @@ public class AudioHandler extends CordovaPlugin {
             }
 
             JSONObject options = args.getJSONObject(2);
-            console.log('Json Object option: ' + JSON.stringify(options));
+
+            Log.d(LOG_TAG, "Recording with options" + options);
+
+            //console.log('Json Object option: ' + JSON.stringify(options));
+
             try {
                 this.audioChannels = options.getInt("NumberOfChannels");
                 this.audioSampleRate = options.getInt("SampleRate");
